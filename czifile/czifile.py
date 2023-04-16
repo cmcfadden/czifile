@@ -443,7 +443,7 @@ class CziFile(object):
         out = create_output(out, self.shape, self.dtype)
 
         if max_workers is None:
-            max_workers = multiprocessing.cpu_count() // 2
+            max_workers = multiprocessing.cpu_count()
 
         def func(directory_entry, resize=resize, order=order,
                  start=self.start, out=out):
@@ -453,7 +453,7 @@ class CziFile(object):
             index = tuple(slice(i - j, i - j + k) for i, j, k in
                           zip(directory_entry.start, start, tile.shape))
             try:
-                # out[index] = ti
+                # out[index] = tile
                 out[index] = (255.0 * (tile.astype(numpy.float32) / 255.0)**(1 / 1.8)).astype(numpy.uint8)
             except ValueError as e:
                 warnings.warn(str(e))
@@ -653,7 +653,7 @@ class SubBlockSegment(object):
             return data
         if de.compression:
             # if de.compression not in DECOMPRESS:
-            #     raise ValueError('compression unknown or not supported')
+                # raise ValueError('compression unknown or not supported')
             with fh.lock:
                 fh.seek(self.data_offset)
                 data = fh.read(self.data_size)
@@ -1259,8 +1259,10 @@ def czi2tif(czifile, tiffile=None, squeeze=True, verbose=True, **kwargs):
             shape = czi.shape
             axes = czi.axes
         dtype = str(czi.dtype)
-        size = product(shape) * czi.dtype.itemsize
 
+
+        size = product(shape) * czi.dtype.itemsize
+        
         verbose(timer)
         verbose('Image\n  axes:  %s\n  shape: %s\n  dtype: %s\n  size:  %s'
                 % (axes, shape, dtype, format_size(size)), flush=True)
