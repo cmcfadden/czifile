@@ -453,7 +453,8 @@ class CziFile(object):
             index = tuple(slice(i - j, i - j + k) for i, j, k in
                           zip(directory_entry.start, start, tile.shape))
             try:
-                out[index] = tile
+                # out[index] = ti
+                out[index] = (255.0 * (tile.astype(numpy.float32) / 255.0)**(1 / 1.8)).astype(numpy.uint8)
             except ValueError as e:
                 warnings.warn(str(e))
 
